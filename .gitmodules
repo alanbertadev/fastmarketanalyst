@@ -1,0 +1,6 @@
+[submodule "mechanize"]
+	path = mechanize
+	url = https://github.com/jjlee/mechanize.git
+[submodule "beautifulsoup"]
+	path = beautifulsoup
+	url = https://github.com/bdoms/beautifulsoup.git
