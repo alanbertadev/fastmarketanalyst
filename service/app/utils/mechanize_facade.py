@@ -36,10 +36,4 @@ class MechanizeFacade:
 		html = r.read()
 		return html
 		
-if __name__ == '__main__':
-	
-	print "Test 1 - fetchSimpleURLAsString"
-	browser = MechanizeFacade()
-	assert browser.fetchSimpleURLAsString("http://callmaker.alanbertadev.com/test.html") == "test"
-	print "PASS"
 	
