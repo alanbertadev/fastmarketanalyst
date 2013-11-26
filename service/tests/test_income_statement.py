@@ -7,3 +7,12 @@ class TestIncomeStatement(unittest.TestCase):
         iStmt = IncomeStatement()
         assert iStmt.extractIncomeStatementFromString(None) == None
 
+    def test_fetch_annual_income_statement_MSFT(self):
+        iStmt = IncomeStatement()
+        response = iStmt.fetchAnnualFromYahooAsHtml( "MSFT" )
+        assert response is not None
+        
+    def test_fetch_quarterly_income_statement_MSFT(self):
+        iStmt = IncomeStatement()
+        response = iStmt.fetchQuarterlyFromYahooAsHtml( "MSFT" )
+        assert response is not None
