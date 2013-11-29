@@ -5,13 +5,35 @@ import logging
 import re
 
 class IncomeStatement:
-    def __init__(self):
-        self.symbolParse = '*SYMBOL*'
+
+    def __init__(self, htmlSrc):
+        self.htmlSrc = htmlSrc
+        
+    def getHtml(self):
+        return self.htmlSrc
+        
+class Annual(IncomeStatement):
+
+    def __init__(self, htmlSrc):
+        IncomeStatement.__init__(self,htmlSrc)
+                
+class Quarterly(IncomeStatement):
+
+    def __init__(self, htmlSrc):
+        IncomeStatement.__init__(self,htmlSrc)
+        
+class IncomeStatementManager:
+
+    def __init__(self, symbol):
         self.annualReport = '&annual'
         self.quarterlyReport = ''
-        self.URL = 'http://finance.yahoo.com/q/is?s=' + self.symbolParse + '+Income+Statement'
+        if symbol is None:
+            symbol = ''
+        self.URL = 'http://finance.yahoo.com/q/is?s=' + symbol + '+Income+Statement'
         self.redis = RedisFacade()
         self.browser = MechanizeFacade()
+        self.quarterlyReportDownloaded = None
+        self.annualReportDownloaded = None
         
     def extractIncomeStatementFromString(self, pageHtml):
         if pageHtml == "" or pageHtml is None:
@@ -82,12 +104,17 @@ class IncomeStatement:
 
         return None
         
-    def fetchAnnualFromYahooAsHtml( self, symbol ):
-        fetchURL = self.URL.replace( self.symbolParse, symbol ) + self.annualReport
-        fullPageHtml = self.browser.fetchSimpleURLAsString(fetchURL)
-        return self.extractIncomeStatementFromString(fullPageHtml)
+    def getAnnual(self):
+        if self.annualReportDownloaded is None:
+            fetchURL = self.URL + self.annualReport
+            fullPageHtml = self.browser.fetchSimpleURLAsString(fetchURL)
+            self.annualReportDownloaded = Annual(self.extractIncomeStatementFromString(fullPageHtml))
+        return self.annualReportDownloaded
             
-    def fetchQuarterlyFromYahooAsHtml( self, symbol ):
-        fetchURL = self.URL.replace( self.symbolParse, symbol ) + self.quarterlyReport
-        fullPageHtml = self.browser.fetchSimpleURLAsString(fetchURL)
-        return self.extractIncomeStatementFromString(fullPageHtml)
+    def getQuarterly(self):
+        if self.annualReportDownloaded is None:
+            fetchURL = self.URL + self.quarterlyReport
+            fullPageHtml = self.browser.fetchSimpleURLAsString(fetchURL)
+            self.annualReportDownloaded = Quarterly(self.extractIncomeStatementFromString(fullPageHtml))
+        return self.annualReportDownloaded
+        
