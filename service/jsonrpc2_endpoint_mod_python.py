@@ -1,5 +1,5 @@
 from mod_python import apache
-from ..app.handler.json_2_fma_handler import Json2FmaHandler
+from app.handler.json_2_fma_handler import Json2FmaHandler
 
 def handler(request):
 
