@@ -10,6 +10,9 @@ class RedisFacade:
     def set( self, key, str_data ):
         self.db.set( key, str_data )
         
+    def setex( self, key, str_data, time ):
+        self.db.setex( key, str_data, time )
+        
     def get( self, key ):
         return self.db.get( key )
                 
