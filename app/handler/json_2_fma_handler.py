@@ -18,14 +18,20 @@ class Json2FmaHandler:
         response = {}
 
         if requestJsonObject is not None:
-            oal = OnlineApplicationLayer()
-            methodName = requestJsonObject['method']
-            paramsData = requestJsonObject['params']
-            
-            methodPtr = getattr(oal, methodName)
-            responseBuilder = methodPtr(paramsData)
-            responseId = requestJsonObject['id']
-            response['result'] = responseBuilder
+            try:
+                oal = OnlineApplicationLayer()
+                methodName = requestJsonObject['method']
+                paramsData = requestJsonObject['params']
+                
+                methodPtr = getattr(oal, methodName)
+                responseBuilder = methodPtr(paramsData)
+                responseId = requestJsonObject['id']
+                response['result'] = responseBuilder
+            except Exception as inst:
+                responseBuilder = {}
+                responseBuilder['code'] = -32099
+                responseBuilder['message'] = str(type(inst)) + ": " + str(inst)
+                response['error'] = responseBuilder
         else:
             responseBuilder = {}
             responseBuilder['code'] = -32700

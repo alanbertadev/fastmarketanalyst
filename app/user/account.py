@@ -21,6 +21,24 @@ class TokenExpiredException(Exception):
         def __str__(self):
             return repr(self.value)
             
+class PasswordParameterNotSuppliedException(Exception):
+        def __init__(self, value):
+            self.value = value
+        def __str__(self):
+            return repr(self.value)
+            
+class EmailParameterNotSuppliedException(Exception):
+        def __init__(self, value):
+            self.value = value
+        def __str__(self):
+            return repr(self.value)
+            
+class AccountEmailAlreadyExistsException(Exception):
+        def __init__(self, value):
+            self.value = value
+        def __str__(self):
+            return repr(self.value)
+
 class Account:
 
     def __init__(self, **args):
@@ -78,16 +96,20 @@ class Account:
         return self.accountExists
         
     def create(self):
+        if self.isAccountCreated():
+            raise AccountEmailAlreadyExistsException(self.email)
         self.redis.set( self.emailKey, self.email )
         self.redis.set( self.passwordKey, self.password )
         self.redis.set( self.watchSymbolsKey, json.dumps(self.watchSymbols) )
+        self.setToken( str(uuid.uuid4()) )
         self.accountExists = True
         
     def delete(self):
-        self.redis.delete( self.emailKey )
-        self.redis.delete( self.passwordKey )
-        self.redis.delete( self.watchSymbolsKey )
-        self.accountExists = False
+        if self.isAccountCreated():
+            self.redis.delete( self.emailKey )
+            self.redis.delete( self.passwordKey )
+            self.redis.delete( self.watchSymbolsKey )
+            self.accountExists = False
 
     def setToken(self, token):
         self.token = token

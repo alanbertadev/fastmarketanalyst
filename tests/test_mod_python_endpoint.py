@@ -1,8 +1,24 @@
 import json
 import unittest
+from ..app.utils.redis_facade import RedisFacade
 from ..app.handler.json_2_fma_handler import Json2FmaHandler
 
 class TestJson2FmaHandler(unittest.TestCase):
+
+    def test_create_new_account(self):
+    
+        redis = RedisFacade()
+    
+        json2FmaHandler = Json2FmaHandler()
+        testString =  "{\"jsonrpc\": \"2.0\", \"method\": \"createAccount\", \"params\": {\"email\": \"alanbertatesting@test.com\", \"password\":\"123456\"}, \"id\": 0}"
+        
+        resData = json2FmaHandler.handle( testString )
+        
+        redis.delete( "alanbertatesting@test.com_email" )
+        redis.delete( "alanbertatesting@test.com_password" )
+        redis.delete( "alanbertatesting@test.com_watchSymbols" )
+        
+        assert json.loads(resData)['result'] is not None
 
     def test_fetch_google_annual_income_statement_as_html(self):
     

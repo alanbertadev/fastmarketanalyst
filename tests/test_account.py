@@ -3,6 +3,7 @@ from ..app.user.account import Account
 from ..app.user.account import InvalidEmailAddressException
 from ..app.user.account import PasswordIsIncorrectException
 from ..app.user.account import TokenExpiredException
+from ..app.user.account import AccountEmailAlreadyExistsException
 
 class TestAccount(unittest.TestCase):
 
@@ -61,4 +62,28 @@ class TestAccount(unittest.TestCase):
         except InvalidEmailAddressException:
             self.fail("test_create_invalid_password_and_login_to_account had invalid password but invalid email address raised!")
         except PasswordIsIncorrectException:
+            try:
+                account = Account(  email="abtest@gmail.com", password="password123456" )
+                account.delete()
+            except PasswordIsIncorrectException:
+                self.fail("test_create_invalid_password_and_login_to_account unable to log back into account")
+            pass
+
+    def test_create_existing_account(self):
+        try:
+            account = Account(  email="abtest3@gmail.com", password="password123456666666" )
+            assert account.isAccountCreated() == False
+            account.create()
+            
+            accountReload = Account(  email="abtest3@gmail.com", password="password123456666666" )
+            assert accountReload.isAccountCreated() == True
+            accountReload.create() #error here
+
+        except InvalidEmailAddressException:
+            self.fail("test_create_existing_account duplicate account but invalid email address raised!")
+        except PasswordIsIncorrectException:
+            self.fail("test_create_existing_account duplicate account but password exception raised!")
+        except AccountEmailAlreadyExistsException:
+            accountReload = Account(  email="abtest3@gmail.com", password="password123456666666" )
+            accountReload.delete()
             pass
