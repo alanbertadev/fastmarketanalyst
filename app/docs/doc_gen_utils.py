@@ -1,42 +1,50 @@
 from BeautifulSoup import BeautifulSoup
 import sys
 
-class DocGenUtils:
+class DocGenUtils(object):
+    """
+    Utility class that providing static methods to manipulate
+    the generated epydoc html documents to make it easier
+    to read the service methods in order for clients to develop
+    apps to consume the services.
+    """
 
     @staticmethod
-    def removeDocumenationNavBar( pageHtml ):
-        soup = BeautifulSoup(pageHtml)
-        allNavBar = soup.findAll('table',{ "class" : "navbar" })
-        for navbar in allNavBar:
-            navbar.extract()
-            
-        firstTable = soup.findAll('table')
-        firstTable[0].extract()
-            
+    def remove_documentation_nav_bar( page_html ):
+        soup = BeautifulSoup(page_html)
+        all_nav_bar = soup.findAll('table', { "class" : "navbar" } )
+        for nav_bar in all_nav_bar:
+            nav_bar.extract()
+
+        first_table = soup.findAll('table')
+        first_table[0].extract()
+
         return soup.prettify()
 
     @staticmethod
-    def renameHeaderToNewHeader( pageHtml ):
-        return pageHtml.replace("Class OnlineApplicationLayer", "FastMarketAnalyst Service Methods").replace( "app.oal.OnlineApplicationLayer", "FastMarketAnalyst Service Methods")
-        
+    def rename_header_to_new_header( page_html ):
+        page_html = page_html.replace("Class OnlineApplicationLayer",
+            "FastMarketAnalyst Service Methods")
+        return page_html.replace( "app.oal.OnlineApplicationLayer",
+            "FastMarketAnalyst Service Methods")
+
     @staticmethod
-    def loadFileAsString( filePath ):
-        linestring = open(filePath, 'r').read()
+    def load_file_as_string( file_path ):
+        linestring = open(file_path, 'r').read()
         return linestring
-        
+
     @staticmethod
-    def writeStringToFile( filePath, fileString ):
-        text_file = open(filePath, "w")
-        text_file.write(fileString)
+    def write_string_to_file( file_path, file_string ):
+        text_file = open(file_path, "w")
+        text_file.write(file_string)
         text_file.close()
 
 
-if  __name__ =='__main__':
-
-    if len(sys.argv) > 1:    
-        strFile = DocGenUtils.loadFileAsString( sys.argv[1] )
-        strFile = DocGenUtils.removeDocumenationNavBar( strFile )
-        strFile = DocGenUtils.renameHeaderToNewHeader( strFile )
-        DocGenUtils.writeStringToFile( sys.argv[1], str(strFile) )
+if  __name__ == '__main__':
+    if len(sys.argv) > 1:
+        STR_FILE = DocGenUtils.load_file_as_string( sys.argv[1] )
+        STR_FILE = DocGenUtils.remove_documentation_nav_bar( STR_FILE )
+        STR_FILE = DocGenUtils.rename_header_to_new_header( STR_FILE )
+        DocGenUtils.write_string_to_file( sys.argv[1], str( STR_FILE ) )
     else:
         raise Exception("Missing file path argument!")
