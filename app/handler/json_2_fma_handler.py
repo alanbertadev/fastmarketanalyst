@@ -2,43 +2,48 @@ import json
 from ..oal import OnlineApplicationLayer
 import sys
 
-class Json2FmaHandler:
+class Json2FmaHandler(object):
     
-    def handle( self, requestString ):
-    
-        requestJsonError = None
-    
+    def handle( self, request_string, token ):
+        """
+        handle a request_string (expects JSON-RPC2 format) and a possible token (extracted from headers)
+        """
+        request_json_error = None
+
         try:
-            requestJsonObject = json.loads(requestString)
+            request_json_object = json.loads(request_string)
         except:
-            requestJsonObject = None
-            requestJsonError = sys.exc_info()[0]
-            
-        responseId = 0
+            request_json_object = None
+            request_json_error = sys.exc_info()[0]
+
+        response_id = 0
         response = {}
 
-        if requestJsonObject is not None:
+        if request_json_object is not None:
             try:
                 oal = OnlineApplicationLayer()
-                methodName = requestJsonObject['method']
-                paramsData = requestJsonObject['params']
+                method_name = request_json_object['method']
+                params_data = request_json_object['params']
                 
-                methodPtr = getattr(oal, methodName)
-                responseBuilder = methodPtr(paramsData)
-                responseId = requestJsonObject['id']
-                response['result'] = responseBuilder
+                if token is not None:
+                    params_data['token'] = token
+                
+                methodPtr = getattr(oal, method_name)
+                response_builder = methodPtr(params_data)
+                response_id = request_json_object['id']
+                response['result'] = response_builder
             except Exception as inst:
-                responseBuilder = {}
-                responseBuilder['code'] = -32099
-                responseBuilder['message'] = str(type(inst)) + ": " + str(inst)
-                response['error'] = responseBuilder
+                response_builder = {}
+                response_builder['code'] = -32099
+                response_builder['message'] = str(type(inst)) + ": " + str(inst)
+                response['error'] = response_builder
         else:
-            responseBuilder = {}
-            responseBuilder['code'] = -32700
-            responseBuilder['message'] = 'Parse error'
-            response['error'] = responseBuilder
+            response_builder = {}
+            response_builder['code'] = -32700
+            response_builder['message'] = 'Parse error'
+            response['error'] = response_builder
         
-        response['id'] = responseId
+        response['id'] = response_id
         response['jsonrpc'] = "2.0"
         response = json.dumps(response)
         

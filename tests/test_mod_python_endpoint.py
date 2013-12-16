@@ -12,7 +12,7 @@ class TestJson2FmaHandler(unittest.TestCase):
         json2FmaHandler = Json2FmaHandler()
         testString =  "{\"jsonrpc\": \"2.0\", \"method\": \"create_account\", \"params\": {\"email\": \"alanbertatesting@test.com\", \"password\":\"123456\"}, \"id\": 0}"
         
-        resData = json2FmaHandler.handle( testString )
+        resData = json2FmaHandler.handle( testString, None )
         
         redis.delete( "alanbertatesting@test.com_email" )
         redis.delete( "alanbertatesting@test.com_password" )
@@ -25,20 +25,20 @@ class TestJson2FmaHandler(unittest.TestCase):
         json2FmaHandler = Json2FmaHandler()
         testString =  "{\"jsonrpc\": \"2.0\", \"method\": \"get_annual_income_statement_as_html\", \"params\": {\"symbol\": \"GOOG\"}, \"id\": 0}"
     
-        assert json.loads(json2FmaHandler.handle( testString ))['result'] is not None
+        assert json.loads(json2FmaHandler.handle( testString, None ))['result'] is not None
         
     def test_fetch_google_quarterly_income_statement_as_html(self):
     
         json2FmaHandler = Json2FmaHandler()
         testString =  "{\"jsonrpc\": \"2.0\", \"method\": \"get_quarterly_income_statement_as_html\", \"params\": {\"symbol\": \"GOOG\"}, \"id\": 0}"
     
-        assert json.loads(json2FmaHandler.handle( testString ))['result'] is not None
+        assert json.loads(json2FmaHandler.handle( testString, None ))['result'] is not None
         
     def test_empty_request(self):
         
         json2FmaHandler = Json2FmaHandler()
         testString = ""
-        resultObj = json.loads(json2FmaHandler.handle( testString ))
+        resultObj = json.loads(json2FmaHandler.handle( testString, None ))
         
         assert 'result' not in resultObj 
         assert 'error' in resultObj
