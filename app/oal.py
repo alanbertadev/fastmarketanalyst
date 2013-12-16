@@ -4,9 +4,45 @@ from user.account import EmailParameterNotSuppliedException
 from user.account import PasswordParameterNotSuppliedException
 from user.account import PasswordIsIncorrectException
 from user.account import AccountEmailAlreadyExistsException
+from user.account import UserNotAuthenticatedException
 import base64
 
 class OnlineApplicationLayer(object):
+
+    def authenticate( self, params ):
+        """
+        Authenticate an account and receive a token
+
+        B{Example JSON-RPC2 Request:}
+
+        I{{"jsonrpc": "2.0", "method": "authenticate", "params": {"email":"alan@test.com", "password":"123456"}, "id": 1}}
+
+        B{Example JSON-RPC2 Response:}
+
+        I{{"jsonrpc": "2.0", "result": { "token": "57d1fc70-65f1-11e3-949a-0800200c9a66" }, "id": 1}}
+
+        @param params: keys:
+
+        E{-} B{email} as I{string}
+
+        E{-} B{password} as I{string}
+
+        @type params: dictionary
+
+        @return:  response keys:
+
+        E{-} B{token} as I{string} The token that must be supplied for future requests
+        """
+        if "email" in params:
+            if "password" in params:
+                ret_obj = {"token":""}
+                account = Account( email=params["email"], password=params["password"] )
+                ret_obj["token"] = account.getToken()
+                return ret_obj
+            else:
+                raise PasswordParameterNotSuppliedException("Request was missing required \"password\" parameter")
+        else:
+            raise EmailParameterNotSuppliedException("Request was missing required \"email\" parameter")
 
     def create_account( self, params ):
         """
