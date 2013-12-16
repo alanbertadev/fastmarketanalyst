@@ -37,7 +37,7 @@ class OnlineApplicationLayer(object):
             if "password" in params:
                 ret_obj = {"token":""}
                 account = Account( email=params["email"], password=params["password"] )
-                ret_obj["token"] = account.getToken()
+                ret_obj["token"] = account.get_token()
                 return ret_obj
             else:
                 raise PasswordParameterNotSuppliedException("Request was missing required \"password\" parameter")

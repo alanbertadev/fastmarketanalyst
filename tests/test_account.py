@@ -12,23 +12,23 @@ class TestAccount(unittest.TestCase):
         
             account = Account( email="abtest@gmail.com", password="password123456" )
             account.delete()
-            assert account.isAccountCreated() == False
+            assert account.is_account_created() == False
             account.create()
-            assert account.isAccountCreated() == True
-            assert account.getToken() is not None
+            assert account.is_account_created() == True
+            assert account.get_token() is not None
             
             accountReload = Account(  email="abtest@gmail.com", password="password123456" )
-            assert accountReload.isAccountCreated() == True
-            assert accountReload.getToken() is not None
+            assert accountReload.is_account_created() == True
+            assert accountReload.get_token() is not None
                         
-            newToken = accountReload.getToken()
+            newToken = accountReload.get_token()
             
             accountReload = Account(  token=newToken )
-            assert accountReload.getEmail() == "abtest@gmail.com"
+            assert accountReload.get_email() == "abtest@gmail.com"
             
             accountReload.delete()
-            assert accountReload.isAccountCreated() == False
-            assert accountReload.getToken() is None
+            assert accountReload.is_account_created() == False
+            assert accountReload.get_token() is None
             
         except InvalidEmailAddressException:
             self.fail("test_create_valid_account has valid email address but exception was raised!")
@@ -50,9 +50,9 @@ class TestAccount(unittest.TestCase):
         try:
             account = Account(  email="abtest@gmail.com", password="password123456" )
             account.delete()
-            assert account.isAccountCreated() == False
+            assert account.is_account_created() == False
             account.create()
-            assert account.isAccountCreated() == True
+            assert account.is_account_created() == True
             
             #wrong password
             accountReload = Account(  email="abtest@gmail.com", password="wrongpassword" )
@@ -71,12 +71,12 @@ class TestAccount(unittest.TestCase):
 
     def test_create_existing_account(self):
         try:
-            account = Account(  email="abtest3@gmail.com", password="password123456666666" )
-            assert account.isAccountCreated() == False
+            account = Account(  email="abtest4@gmail.com", password="password123456666666" )
+            assert account.is_account_created() == False
             account.create()
             
-            accountReload = Account(  email="abtest3@gmail.com", password="password123456666666" )
-            assert accountReload.isAccountCreated() == True
+            accountReload = Account(  email="abtest4@gmail.com", password="password123456666666" )
+            assert accountReload.is_account_created() == True
             accountReload.create() #error here
 
         except InvalidEmailAddressException:
@@ -84,6 +84,6 @@ class TestAccount(unittest.TestCase):
         except PasswordIsIncorrectException:
             self.fail("test_create_existing_account duplicate account but password exception raised!")
         except AccountEmailAlreadyExistsException:
-            accountReload = Account(  email="abtest3@gmail.com", password="password123456666666" )
+            accountReload = Account(  email="abtest4@gmail.com", password="password123456666666" )
             accountReload.delete()
             pass

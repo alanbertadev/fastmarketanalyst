@@ -45,7 +45,7 @@ class UserNotAuthenticatedException(Exception):
         def __str__(self):
             return repr(self.value)
 
-class Account:
+class Account(object):
 
     def __init__(self, **args):
         self.redis = RedisFacade()
@@ -66,8 +66,8 @@ class Account:
         
         self.email = None
         self.password = None
-        self.watchSymbols = {}
-        self.watchSymbols['symbols'] = []
+        self.watch_symbols = {}
+        self.watch_symbols['symbols'] = []
         self.token = None
         
         if token is not None:
@@ -82,71 +82,74 @@ class Account:
             raise InvalidEmailAddressException( email )
             
         self.email = email
-        self.emailKey = self.email + "_email"
-        self.watchSymbolsKey = self.email + "_watchSymbols"
-        self.passwordKey = self.email + "_password"
+        self.email_key = self.email + "_email"
+        self.watch_symbolsKey = self.email + "_watch_symbols"
+        self.password_key = self.email + "_password"
         
         if token is not None:
-            if self.redis.exists( self.passwordKey ):
-                password = self.redis.get( self.passwordKey )
+            if self.redis.exists( self.password_key ):
+                password = self.redis.get( self.password_key )
         
         self.password = password
         
         if self.load() == True:
             if token is not None:
-                self.setToken( token )
+                self.set_token( token )
             else:
-                self.setToken( str(uuid.uuid4()) )
+                self.set_token( str(uuid.uuid4()) )
             
-    def isAccountCreated(self):
+    def is_account_created(self):
         return self.accountExists
         
     def create(self):
-        if self.isAccountCreated():
+        if self.is_account_created():
             raise AccountEmailAlreadyExistsException(self.email)
-        self.redis.set( self.emailKey, self.email )
-        self.redis.set( self.passwordKey, self.password )
-        self.redis.set( self.watchSymbolsKey, json.dumps(self.watchSymbols) )
-        self.setToken( str(uuid.uuid4()) )
+        self.redis.set( self.email_key, self.email )
+        self.redis.set( self.password_key, self.password )
+        self.redis.set( self.watch_symbolsKey, json.dumps(self.watch_symbols) )
+        self.set_token( str(uuid.uuid4()) )
         self.accountExists = True
         
     def delete(self):
-        if self.isAccountCreated():
-            self.redis.delete( self.emailKey )
-            self.redis.delete( self.passwordKey )
-            self.redis.delete( self.watchSymbolsKey )
+        if self.is_account_created():
+            self.redis.delete( self.email_key )
+            self.redis.delete( self.password_key )
+            self.redis.delete( self.watch_symbolsKey )
             self.accountExists = False
 
-    def setToken(self, token):
+    def set_token(self, token):
         self.token = token
         self.redis.setex( self.token, self.email, 500 )
         
-    def getToken(self):
+    def get_token(self):
         if self.accountExists:
             return self.token
         else:
             return None
         
-    def getEmail(self):
+    def get_email(self):
         return self.email
         
-    def getWatchList(self):
-        return self.watchSymbols['symbols']
+    def get_watch_list(self):
+        return self.watch_symbols['symbols']
         
-    def deleteSymbolInWatchlist(self, symbol):
-        if symbol in self.watchSymbols['symbols']: self.watchSymbols['symbols'].remove(symbol)
+    def delete_symbol_in_watchlist(self, symbol):
+        if symbol in self.watch_symbols['symbols']: 
+            self.watch_symbols['symbols'].remove(symbol)
+            self.redis.set( self.watch_symbolsKey, json.dumps(self.watch_symbols) )
         
-    def addSymbolToWatchlist(self, symbol):
-        self.watchSymbols['symbols'].append(symbol)
+    def add_symbol_to_watchlist(self, symbol):
+        self.watch_symbols['symbols'].append(symbol)
+        self.redis.set( self.watch_symbolsKey, json.dumps(self.watch_symbols) )
         
     def load(self):
-        if self.redis.exists( self.emailKey ):
-            if self.redis.get( self.passwordKey ) != self.password:
+        if self.redis.exists( self.email_key ):
+            if self.redis.get( self.password_key ) != self.password:
                 raise PasswordIsIncorrectException( self.email )
             try:
-                self.watchSymbolsKey = json.loads(  self.redis.get( self.watchSymbolsKey )  )['symbols']
+                self.watch_symbolsKey = json.loads(  self.redis.get( self.watch_symbolsKey )  )['symbols']
             except:
-                self.watchSymbols = {}
-                self.watchSymbols['symbols'] = []
+                self.watch_symbols = {}
+                self.watch_symbols['symbols'] = []
             self.accountExists = True
-            self.setToken(str(uuid.uuid4())) 
+            self.set_token(str(uuid.uuid4())) 
