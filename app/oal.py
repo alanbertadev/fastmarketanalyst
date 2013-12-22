@@ -9,7 +9,7 @@ import base64
 
 class OnlineApplicationLayer(object):
 
-    def authenticate( self, params ):
+    def authenticate(self, params):
         """
         Authenticate an account and receive a token
 
@@ -36,7 +36,7 @@ class OnlineApplicationLayer(object):
         if "email" in params:
             if "password" in params:
                 ret_obj = {"token":""}
-                account = Account( email=params["email"], password=params["password"] )
+                account = Account(email=params["email"], password=params["password"])
                 ret_obj["token"] = account.get_token()
                 return ret_obj
             else:
@@ -44,7 +44,7 @@ class OnlineApplicationLayer(object):
         else:
             raise EmailParameterNotSuppliedException("Request was missing required \"email\" parameter")
 
-    def create_account( self, params ):
+    def create_account(self, params):
         """
         Create a new account to monitor a watchlist of securities
 
@@ -72,9 +72,9 @@ class OnlineApplicationLayer(object):
             if "password" in params:
                 ret_obj = {"email":""}
                 try:
-                    account = Account( email=params["email"], password=params["password"] )
+                    account = Account(email=params["email"], password=params["password"])
                 except PasswordIsIncorrectException:
-                    raise AccountEmailAlreadyExistsException( "Account with email " + params["email"]  + " already exists!" )
+                    raise AccountEmailAlreadyExistsException("Account with email " + params["email"] + " already exists!")
                 account.create()
                 ret_obj["email"] = params["email"]
                 return ret_obj
@@ -83,7 +83,7 @@ class OnlineApplicationLayer(object):
         else:
             raise EmailParameterNotSuppliedException("Request was missing required \"email\" parameter")
 
-    def get_annual_income_statement_as_html( self, params ):
+    def get_annual_income_statement_as_html(self, params):
         """
         Fetch(from Yahoo.com) the annual income statement of a given security
 
@@ -110,7 +110,7 @@ class OnlineApplicationLayer(object):
         ret_obj['income_statement'] = base64.b64encode(income_statement_manager.getAnnual().getHtml())
         return ret_obj
 
-    def get_quarterly_income_statement_as_html( self, params ):
+    def get_quarterly_income_statement_as_html(self, params):
         """
         Fetch(from Yahoo.com) the quarterly income statement of a given security
 

@@ -10,6 +10,6 @@ def handler(request):
 
     json2_fma_handler = Json2FmaHandler()
     request.content_type = json2_fma_handler.getContentType()
-    request.write(json2_fma_handler.handle( request.read(), token ) )
+    request.write(json2_fma_handler.handle(request.read(), token))
 
     return apache.OK

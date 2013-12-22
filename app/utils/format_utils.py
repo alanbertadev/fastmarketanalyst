@@ -3,7 +3,7 @@ import re
 class FormatUtils:
     
     @staticmethod
-    def isValidEmailAddressFormat( emailkey ):
+    def isValidEmailAddressFormat(emailkey):
 
         """Email validation, checks for syntactically valid email courtesy of Mark Nenadov.
         See http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/65215"""

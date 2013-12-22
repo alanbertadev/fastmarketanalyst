@@ -15,12 +15,12 @@ class IncomeStatement:
 class Annual(IncomeStatement):
 
     def __init__(self, htmlSrc):
-        IncomeStatement.__init__(self,htmlSrc)
+        IncomeStatement.__init__(self, htmlSrc)
                 
 class Quarterly(IncomeStatement):
 
     def __init__(self, htmlSrc):
-        IncomeStatement.__init__(self,htmlSrc)
+        IncomeStatement.__init__(self, htmlSrc)
         
 class IncomeStatementManager:
 
@@ -44,8 +44,8 @@ class IncomeStatementManager:
         tbl = soup.find(id='yfncsumtab')
         if tbl is not None:
             
-            #remove first header <tr> that has Income: and search + GO button
-            modTitle = soup.find('table',{ "class" : "yfnc_modtitle1" })
+            # remove first header <tr> that has Income: and search + GO button
+            modTitle = soup.find('table', { "class" : "yfnc_modtitle1" })
             if modTitle is None:
                 logging.warn('extractIncomeStatementFromString - no modTitletr id found')
             else:
@@ -59,15 +59,15 @@ class IncomeStatementManager:
                     logging.warn('extractIncomeStatementFromString - no modTitle TD parent found')
                     return None
         
-            #strip out any promo table items
-            allPromo = soup.findAll('table',{ "class" : "yfnc_promooutline1" })
+            # strip out any promo table items
+            allPromo = soup.findAll('table', { "class" : "yfnc_promooutline1" })
             if not allPromo:
                 logging.warn('extractIncomeStatementFromString - no class=yfnc_promooutline1 found')
                 return None
             for promo in allPromo:
                 promo.extract()
             
-            #strip out the annual/quarter toggle links from yahoo
+            # strip out the annual/quarter toggle links from yahoo
             allViewToggle = soup.findAll(text=re.compile("\AView.*$"))
             if not allViewToggle:
                 logging.warn('extractIncomeStatementFromString - \AView.*$ has found no items!')
@@ -79,7 +79,7 @@ class IncomeStatementManager:
                     logging.warn('extractIncomeStatementFromString - viewItem.parent is null!')
                     return None
             
-            #Add styles from the page so that it looks ok
+            # Add styles from the page so that it looks ok
             styleCompressed = ""
             
             allInlineStyles = soup.findAll('style')

@@ -4,7 +4,7 @@ import sys
 
 class Json2FmaHandler(object):
     
-    def handle( self, request_string, token ):
+    def handle(self, request_string, token):
         """
         handle a request_string (expects JSON-RPC2 format) and a possible token (extracted from headers)
         """
