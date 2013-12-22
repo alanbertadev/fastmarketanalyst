@@ -66,8 +66,7 @@ class Account(object):
         
         self.email = None
         self.password = None
-        self.watch_symbols = {}
-        self.watch_symbols['symbols'] = []
+        self.watch_symbols = { 'symbols': [] }
         self.token = None
         
         if token is not None:
@@ -83,7 +82,7 @@ class Account(object):
             
         self.email = email
         self.email_key = self.email + "_email"
-        self.watch_symbolsKey = self.email + "_watch_symbols"
+        self.watch_symbols_key = self.email + "_watch_symbols"
         self.password_key = self.email + "_password"
         
         if token is not None:
@@ -106,7 +105,7 @@ class Account(object):
             raise AccountEmailAlreadyExistsException(self.email)
         self.redis.set(self.email_key, self.email)
         self.redis.set(self.password_key, self.password)
-        self.redis.set(self.watch_symbolsKey, json.dumps(self.watch_symbols))
+        self.redis.set(self.watch_symbols_key, json.dumps(self.watch_symbols))
         self.set_token(str(uuid.uuid4()))
         self.accountExists = True
         
@@ -114,7 +113,7 @@ class Account(object):
         if self.is_account_created():
             self.redis.delete(self.email_key)
             self.redis.delete(self.password_key)
-            self.redis.delete(self.watch_symbolsKey)
+            self.redis.delete(self.watch_symbols_key)
             self.accountExists = False
 
     def set_token(self, token):
@@ -133,23 +132,22 @@ class Account(object):
     def get_watch_list(self):
         return self.watch_symbols['symbols']
         
-    def delete_symbol_in_watchlist(self, symbol):
+    def delete_symbol_in_watch_list(self, symbol):
         if symbol in self.watch_symbols['symbols']: 
             self.watch_symbols['symbols'].remove(symbol)
-            self.redis.set(self.watch_symbolsKey, json.dumps(self.watch_symbols))
+            self.redis.set(self.watch_symbols_key, json.dumps(self.watch_symbols))
         
-    def add_symbol_to_watchlist(self, symbol):
+    def add_symbols_to_watch_list(self, symbol):
         self.watch_symbols['symbols'].append(symbol)
-        self.redis.set(self.watch_symbolsKey, json.dumps(self.watch_symbols))
+        self.redis.set(self.watch_symbols_key, json.dumps(self.watch_symbols))
         
     def load(self):
         if self.redis.exists(self.email_key):
             if self.redis.get(self.password_key) != self.password:
                 raise PasswordIsIncorrectException(self.email)
             try:
-                self.watch_symbolsKey = json.loads(self.redis.get(self.watch_symbolsKey))['symbols']
+                self.watch_symbols = json.loads(self.redis.get(self.watch_symbols_key))
             except:
-                self.watch_symbols = {}
-                self.watch_symbols['symbols'] = []
+                self.watch_symbols = { 'symbols': [] }
             self.accountExists = True
             self.set_token(str(uuid.uuid4())) 

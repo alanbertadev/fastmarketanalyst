@@ -6,11 +6,13 @@ from user.account import PasswordIsIncorrectException
 from user.account import AccountEmailAlreadyExistsException
 from user.account import UserNotAuthenticatedException
 import base64
+from secure_oal import SecureOnlineApplicationLayer
+from secure_oal import ParameterNotSuppliedException
 
-class OnlineApplicationLayer(object):
-
+class OnlineApplicationLayer(SecureOnlineApplicationLayer):
+      
     def authenticate(self, params):
-        """
+        """        
         Authenticate an account and receive a token
 
         B{Example JSON-RPC2 Request:}
@@ -105,6 +107,7 @@ class OnlineApplicationLayer(object):
 
         E{-} B{income_statement} as I{string} a Base64 encoded HTML of the annual income statement
         """
+        # account = self._requires_token(params)
         ret_obj = {'income_statement':""}
         income_statement_manager = IncomeStatementManager(params['symbol'])
         ret_obj['income_statement'] = base64.b64encode(income_statement_manager.getAnnual().getHtml())
@@ -132,7 +135,75 @@ class OnlineApplicationLayer(object):
 
         E{-} B{income_statement} as I{string} a Base64 encoded HTML of the quarterly income statement
         """
+        # account = self._requires_token(params)
         ret_obj = {'income_statement':""}
         income_statement_manager = IncomeStatementManager(params['symbol'])
         ret_obj['income_statement'] = base64.b64encode(income_statement_manager.getQuarterly().getHtml())
+        return ret_obj
+    
+    #
+    # Begin _requires_token() service methods
+    #
+    
+    def add_symbols_to_watch_list(self, params):
+        """
+        Add an array of symbols to the user's personal watch list of securities
+
+        B{Example JSON-RPC2 Request:}
+
+        I{{"jsonrpc": "2.0", "method": "add_symbols_to_watch_list", "params": { "watch_list": ["GOOG","MSFT"] }, "id": 1}}
+
+        B{Example JSON-RPC2 Response:}
+
+        I{{"jsonrpc": "2.0", "result": { "watch_list": ["GOOG","MSFT"] }, "id": 1}}
+
+        @param params: keys:
+
+        E{-} B{symbols} as I{array} of I{string}
+
+        @type params: dictionary
+
+        @return:  response keys:
+
+        E{-} B{watch_list} as I{array} of I{string} each element is a security symbol that was added
+        """
+        account = self._requires_token(params)
+        if "symbols" in params:
+            symbols = params['symbols']
+            if isinstance(symbols, list):
+                for sym in symbols:
+                    account.add_symbols_to_watch_list(sym)
+                ret_obj = {'symbols':""}
+                ret_obj['symbols'] = symbols
+                return ret_obj
+            else:
+                raise ParameterNotSuppliedException("Request was missing required \"symbols\" parameter. The parameter must be an array of symbols.")
+        else:
+            raise ParameterNotSuppliedException("Request was missing required \"symbols\" parameter")
+        
+    def get_watch_list(self, params):
+        """
+        Get the currently authenticated user's personal watch list of securities
+
+        B{Example JSON-RPC2 Request:}
+
+        I{{"jsonrpc": "2.0", "method": "get_watch_list", "params": {}, "id": 1}}
+
+        B{Example JSON-RPC2 Response:}
+
+        I{{"jsonrpc": "2.0", "result": { "watch_list": ["GOOG","MSFT"] }, "id": 1}}
+
+        @param params: keys:
+
+        E{-} I{No params}
+
+        @type params: dictionary
+
+        @return:  response keys:
+
+        E{-} B{watch_list} as I{array} of I{string} each element is a security symbol
+        """
+        account = self._requires_token(params)
+        ret_obj = {"watch_list":[]}
+        ret_obj['watch_list'] = account.get_watch_list()
         return ret_obj

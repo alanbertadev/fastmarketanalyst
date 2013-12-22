@@ -29,6 +29,40 @@ class DocGenUtils(object):
             "FastMarketAnalyst Service Methods")
 
     @staticmethod
+    def remove_base_tree_diagram(page_html):
+        soup = BeautifulSoup(page_html)
+        base_tree_diagram = soup.findAll('pre', { "class" : "base-tree" })
+        for base_tree in base_tree_diagram:
+            base_tree.extract()
+        
+        return soup.prettify()
+    
+    @staticmethod
+    def remove_all_summary_returns(page_html):
+        soup = BeautifulSoup(page_html)
+        summary_returns = soup.findAll('td', { "class" : "summary" , "align" :"right", "width" :"15%"  })
+        for summary_return in summary_returns:
+            summary_return.extract()
+        
+        return soup.prettify()
+    
+    @staticmethod
+    def remove_properties_section(page_html):
+        soup = BeautifulSoup(page_html)
+        properties_table = soup.findAll('table', { "class" : "summary"})
+        properties_table[1].extract()
+        return soup.prettify()
+    
+    @staticmethod
+    def remove_superclass_details(page_html):
+        soup = BeautifulSoup(page_html)
+        properties_table = soup.findAll(name='table', attrs={ "class" : "summary"})
+        soup2 = properties_table[0].findAll(name="tr", recursive=False)
+        last_item = len(soup2) - 1
+        soup2[last_item].extract()
+        return soup.prettify()
+
+    @staticmethod
     def load_file_as_string(file_path):
         linestring = open(file_path, 'r').read()
         return linestring
@@ -45,6 +79,10 @@ if  __name__ == '__main__':
         STR_FILE = DocGenUtils.load_file_as_string(sys.argv[1])
         STR_FILE = DocGenUtils.remove_documentation_nav_bar(STR_FILE)
         STR_FILE = DocGenUtils.rename_header_to_new_header(STR_FILE)
+        STR_FILE = DocGenUtils.remove_base_tree_diagram(STR_FILE)
+        STR_FILE = DocGenUtils.remove_properties_section(STR_FILE)
+        STR_FILE = DocGenUtils.remove_all_summary_returns(STR_FILE)
+        STR_FILE = DocGenUtils.remove_superclass_details(STR_FILE)
         DocGenUtils.write_string_to_file(sys.argv[1], str(STR_FILE))
     else:
         raise Exception("Missing file path argument!")
