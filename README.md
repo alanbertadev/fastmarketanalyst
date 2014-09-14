@@ -1,7 +1,7 @@
 FastMarketAnalyst
 =================
 
-Web services for obtaining market data from popular news sources and fast computational analysis of new sources into badges.
+Web services for obtaining market data. All services are publicly accessible.
 
 =================
   
