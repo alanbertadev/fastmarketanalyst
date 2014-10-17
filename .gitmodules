@@ -7,3 +7,9 @@
 [submodule "zipline"]
 	path = zipline
 	url = https://github.com/quantopian/zipline.git
+[submodule "Yahoo-ticker-symbol-downloader"]
+	path = Yahoo-ticker-symbol-downloader
+	url = https://github.com/Benny-/Yahoo-ticker-symbol-downloader.git
+[submodule "ExtJS4"]
+	path = ExtJS4
+	url = https://github.com/partkeepr/ExtJS4.git
