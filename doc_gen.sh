@@ -1,4 +1,9 @@
 #!/bin/bash
+
+#
+# Generate web-services web docs (Javadoc style)
+#
+
 rm service/docs/*
 epydoc -v --html app.oal -o service/docs
 mv service/docs/index.html service/docs/index.html.old

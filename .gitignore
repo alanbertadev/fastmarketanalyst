@@ -38,3 +38,8 @@ coverage.xml
 pylint.out
 
 service/docs
+
+Yahoo-ticker-symbol-downloader/Stock*
+Yahoo-ticker-symbol-downloader/downloader*
+
+.staging-symbols

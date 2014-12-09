@@ -7,10 +7,13 @@ git submodule update --recursive
 
 cd mechanize
 python setup.py install
-
 cd ../
 
 cd beautifulsoup
+python setup.py install
+cd ../
+
+cd Yahoo-ticker-symbol-downloader
 python setup.py install
 cd ../
 
